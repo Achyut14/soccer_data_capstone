@@ -1,27 +1,7 @@
-// const { Pool } = require('pg');
-
-// const pool = new Pool({
-//   user: 'your_username',
-//   host: 'localhost',
-//   database: 'your_database_name',
-//   password: 'your_password',
-//   port: 5432,
-// });
-
-// module.exports = pool;
 
 
-// const { Pool } = require('pg');
 
-// const pool = new Pool({
-//   user: 'your_username', // <-- This should be a valid PostgreSQL role
-//   host: 'localhost',
-//   database: 'myappdb',
-//   password: 'your_password',
-//   port: 5432
-// });
-
-
+// require('dotenv').config();
 // const { Pool } = require('pg');
 
 // const pool = new Pool({
@@ -36,7 +16,9 @@
 
 require('dotenv').config();
 const { Pool } = require('pg');
+const { Sequelize } = require('sequelize');
 
+// Pool for direct pg usage
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -45,4 +27,42 @@ const pool = new Pool({
   port: process.env.DB_PORT
 });
 
-module.exports = pool;
+// Sequelize setup
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  protocol: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false // Important for Heroku
+    }
+  }
+});
+
+// Export both configurations
+module.exports = {
+  pool,
+  sequelize,
+  development: {
+    use_env_variable: 'DATABASE_URL',
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  },
+  production: {
+    use_env_variable: 'DATABASE_URL',
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  }
+};

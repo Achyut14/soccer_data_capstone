@@ -10,6 +10,7 @@ const User = require('./src/models/User');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const path = require('path');
 
 // Enable CORS for all routes and origins
 app.use(cors());
@@ -112,6 +113,9 @@ app.get('/user', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -5,6 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 const pool = require('./config/db');
 const User = require('./src/models/User');
 

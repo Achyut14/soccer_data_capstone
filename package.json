@@ -27,7 +27,8 @@
     "build": "react-scripts build",
     "heroku-postbuild": "npm run build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "migrate": "sequelize db:migrate"
     
   },
   "eslintConfig": {

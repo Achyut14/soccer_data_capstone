@@ -19,12 +19,11 @@ function App() {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('token') ? true : false);
 
-  const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
   useEffect(() => {
     const fetchData = async (date) => {
       try {
         setLoading(true);
-        const response = await fetch(`${baseUrl}/matches?date=${date}`);
+        const response = await fetch(`http://localhost:3001/matches?date=${date}`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

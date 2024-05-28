@@ -23,7 +23,12 @@ function App() {
     const fetchData = async (date) => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3001/matches?date=${date}`);
+        const baseUrl = process.env.REACT_APP_API_URL;
+        const response = await fetch(`${baseUrl}/matches?date=${date}`, {
+          headers: {
+            'X-Auth-Token': process.env.REACT_APP_API_TOKEN
+          }
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

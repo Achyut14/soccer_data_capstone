@@ -141,12 +141,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Configure CORS for all routes and origins
-const corsOptions = {
+app.use(cors({
   origin: 'https://polar-waters-72692-16d627fdc711.herokuapp.com', // Adjust this to your frontend's URL
   credentials: true,
   optionsSuccessStatus: 200 // For legacy browser support
-};
-app.use(cors(corsOptions));
+}));
 
 // Enable JSON body parsing and cookie parsing
 app.use(express.json());
@@ -155,7 +154,7 @@ app.use(cookieParser());
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'build')));
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = 'https://api.football-data.org/v4'; // Ensure this is the correct API base URL
 const API_TOKEN = process.env.REACT_APP_API_TOKEN;
 
 // Middleware to authenticate the user using JWT
@@ -170,8 +169,8 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Proxy endpoint
-app.get('/matches', async (req, res) => {
+// Proxy endpoint for matches
+app.get('/api/matches', async (req, res) => {
   const { date } = req.query;
   try {
     const response = await axios.get(`${API_URL}/matches${date ? `?date=${date}` : ''}`, {
@@ -212,21 +211,18 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    console.log('Login attempt for username:', username);  // Log username for debugging
     const user = await User.findByUsername(username);
     if (!user) {
-      console.log('User not found:', username);  // Log user not found
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      console.log('Incorrect password for user:', username);  // Log incorrect password
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true, secure: true }); // secure: true only if using HTTPS
+    res.cookie('token', token, { httpOnly: true, secure: true });
     res.json({ message: 'Login successful', token });
   } catch (error) {
     console.error('Login error:', error);

@@ -10,7 +10,7 @@ const pool = require('./config/db');
 const User = require('./src/models/User');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 80;
 
 // Enable CORS for all routes and origins
 app.use(cors());

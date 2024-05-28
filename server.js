@@ -140,13 +140,6 @@ const User = require('./src/models/User');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configure CORS for all routes and origins
-app.use(cors({
-  origin: 'https://polar-waters-72692-16d627fdc711.herokuapp.com', // Adjust this to your frontend's URL
-  credentials: true,
-  optionsSuccessStatus: 200 // For legacy browser support
-}));
-
 // Enable JSON body parsing and cookie parsing
 app.use(express.json());
 app.use(cookieParser());
@@ -154,14 +147,13 @@ app.use(cookieParser());
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'build')));
 
-const API_URL = 'https://api.football-data.org/v4'; // Ensure this is the correct API base URL
-const API_TOKEN = process.env.REACT_APP_API_TOKEN;
+const API_URL = 'https://api.football-data.org/v4'; // This should be the base URL of the external API
+const API_TOKEN = process.env.REACT_APP_API_TOKEN; // Your API token
 
 // Middleware to authenticate the user using JWT
 const authenticateToken = (req, res, next) => {
-  const token = req.cookies.token || req.headers['authorization']?.split(' ')[1]; // Adjust for different token formats
+  const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
   if (!token) return res.sendStatus(401); // Unauthorized
-
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.sendStatus(403); // Forbidden
     req.user = user;
@@ -169,7 +161,14 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Proxy endpoint for matches
+// Enable CORS for all routes
+app.use(cors({
+  origin: ['https://polar-waters-72692-16d627fdc711.herokuapp.com'], // Adjust to match the URL of your frontend
+  credentials: true,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}));
+
+// Proxy endpoint for fetching matches with explicit CORS headers
 app.get('/api/matches', async (req, res) => {
   const { date } = req.query;
   try {
@@ -215,12 +214,10 @@ app.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
-
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
-
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('token', token, { httpOnly: true, secure: true });
     res.json({ message: 'Login successful', token });
@@ -230,7 +227,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Endpoint to get user details
 app.get('/user', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -244,12 +240,10 @@ app.get('/user', authenticateToken, async (req, res) => {
   }
 });
 
-// Catchall handler for any request that doesn't match the above routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

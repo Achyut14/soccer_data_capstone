@@ -23,7 +23,7 @@ function App() {
     const fetchData = async (date) => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3001/matches?date=${date}`);
+        const response = await fetch(`${baseUrl}/matches?date=${date}`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

@@ -163,7 +163,7 @@ const authenticateToken = (req, res, next) => {
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: ['https://polar-waters-72692-16d627fdc711.herokuapp.com'], // Adjust to match the URL of your frontend
+  origin: ['https://polar-waters-72692-16d627fdc711.herokuapp.com/'], // Adjust to match the URL of your frontend
   credentials: true,
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
